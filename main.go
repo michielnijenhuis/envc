@@ -1,6 +1,6 @@
 package main
 
-import "envcmp/cmd"
+import "envc/cmd"
 
 func main() {
 	cmd.Execute()

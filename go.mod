@@ -1,4 +1,4 @@
-module envcmp
+module envc
 
 go 1.23.0
 
