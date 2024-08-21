@@ -27,9 +27,13 @@ func makeTableHeaders(envs []map[string]*EnvVar, paths []string, options *Option
 	headers := make([]string, 0, 1+len(envs))
 	headers = append(headers, "")
 
-	for _, path := range paths {
+	for i, path := range paths {
 		base := filepath.Base(path)
 		headers = append(headers, base)
+
+		if i == 0 && options.System {
+			headers = append(headers, "os")
+		}
 	}
 
 	if options.Result {

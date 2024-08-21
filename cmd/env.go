@@ -101,3 +101,20 @@ func getKeys[T comparable, U any](m map[T]U) []T {
 	}
 	return s
 }
+
+func addSystemEnvs(envs []map[string]*EnvVar, keysIndex map[string]int) []map[string]*EnvVar {
+	sys := make(map[string]*EnvVar, len(keysIndex))
+	for k := range keysIndex {
+		sys[k] = &EnvVar{
+			Key:   k,
+			Value: os.Getenv(k),
+		}
+	}
+
+	newEnvs := make([]map[string]*EnvVar, 0, 1+len(envs))
+	newEnvs = append(newEnvs, envs[0])
+	newEnvs = append(newEnvs, sys)
+	newEnvs = append(newEnvs, envs[1:]...)
+
+	return newEnvs
+}

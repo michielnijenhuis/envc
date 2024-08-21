@@ -90,6 +90,12 @@ func init() {
 		Description: "Interpolate env var values that refer to other env vars",
 		Mode:        cli.InputOptionBool,
 	})
+
+	Command.AddOption(&cli.InputOption{
+		Name:        "system",
+		Description: "Include system values",
+		Mode:        cli.InputOptionBool,
+	})
 }
 
 type Options struct {
@@ -103,6 +109,7 @@ type Options struct {
 	Pattern     string
 	Interpolate bool
 	Result      bool
+	System      bool
 }
 
 func handle(c *cli.Command) (int, error) {
@@ -123,6 +130,10 @@ func handle(c *cli.Command) (int, error) {
 	}
 
 	keysIndex := makeEnvVarIndex(envs)
+
+	if options.System {
+		envs = addSystemEnvs(envs, keysIndex)
+	}
 
 	if options.Skip != "" {
 		keysIndex = applySkipPattern(keysIndex, options.Skip)
@@ -226,6 +237,13 @@ func getOptions(c *cli.Command) (*Options, error) {
 		return nil, err
 	}
 	options.Result = includeResult
+
+	// system
+	system, err := c.BoolOption("system")
+	if err != nil {
+		return nil, err
+	}
+	options.System = system
 
 	return options, nil
 }
