@@ -40,7 +40,7 @@ func readEnvFile(path string) (map[string]*EnvVar, error) {
 		line := scanner.Text()
 		line = strings.TrimSpace(line)
 
-		if strings.HasPrefix(line, "#") {
+		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
 
