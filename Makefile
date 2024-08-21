@@ -2,10 +2,6 @@ BIN="./bin"
 NAME="envc"
 SRC=$(shell find . -name "*.go")
 
-ifeq (, $(shell which golangci-lint))
-$(warning "could not find golangci-lint in $(PATH), run: curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh")
-endif
-
 .PHONY: fmt lint test install_deps clean
 
 default: all

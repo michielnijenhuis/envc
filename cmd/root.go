@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"log"
+
 	"github.com/michielnijenhuis/cli"
 )
 
@@ -16,5 +18,7 @@ func Execute() {
 
 	app.Add(Command)
 
-	app.Run()
+	if _, err := app.Run(); err != nil {
+		log.Fatalln(err)
+	}
 }
