@@ -9,7 +9,7 @@ import (
 func Execute() {
 	app := &cli.Application{
 		Name:           "envc",
-		Version:        "v2.1.0",
+		Version:        "v2.2.1",
 		CatchErrors:    true,
 		AutoExit:       true,
 		SingleCommand:  true,
