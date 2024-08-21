@@ -96,6 +96,13 @@ func init() {
 		Description: "Include os values",
 		Mode:        cli.InputOptionBool,
 	})
+
+	Command.AddOption(&cli.InputOption{
+		Name:        "all",
+		Shortcut:    "a",
+		Description: "Include all .env files that can be found",
+		Mode:        cli.InputOptionBool,
+	})
 }
 
 type Options struct {
@@ -110,6 +117,7 @@ type Options struct {
 	Interpolate bool
 	Result      bool
 	System      bool
+	All         bool
 }
 
 func handle(c *cli.Command) (int, error) {
@@ -118,7 +126,11 @@ func handle(c *cli.Command) (int, error) {
 		return 1, err
 	}
 
-	paths := getEnvFilePaths(options)
+	paths, err := getEnvFilePaths(options)
+	if err != nil {
+		return 1, err
+	}
+
 	err = validateFilePaths(paths)
 	if err != nil {
 		return 1, err
@@ -244,6 +256,13 @@ func getOptions(c *cli.Command) (*Options, error) {
 		return nil, err
 	}
 	options.System = system
+
+	// all
+	all, err := c.BoolOption("all")
+	if err != nil {
+		return nil, err
+	}
+	options.All = all
 
 	return options, nil
 }

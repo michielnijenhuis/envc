@@ -3,6 +3,25 @@
 ## Description:
   Prints all variables in the available .env file(s), sorted alphabetically
 
+## Installation:
+**Homebrew**:
+```sh
+$ brew install envc
+```
+
+
+**Manually**:
+Clone the repository, and run:
+
+```sh
+$ make install
+```
+If you don't have `make` installed, run:
+```sh
+$ go build -o ./bin/envc
+$ sudo mv ./bin/envc /user/local/bin
+```
+
 ## Usage:
 ```sh
 $ envc [options] [--] [dir]
@@ -52,6 +71,10 @@ dir                     -- The directory to check for .env files [default: ./]
 
 ```
     --system            -- Include os values
+```
+
+```
+-a, --all               -- Include all .env files that can be found
 ```
 
 ```

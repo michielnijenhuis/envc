@@ -28,5 +28,10 @@ build:
 	$(info ******************** building ********************)
 	go build -o $(BIN)/$(NAME)
 
+install:
+	$(info ******************** building ********************)
+	go build -o $(BIN)/$(NAME)
+	sudo mv $(BIN)/$(NAME) /usr/local/bin
+
 clean:
 	rm -rf $(BIN)
