@@ -93,7 +93,7 @@ func init() {
 
 	Command.AddOption(&cli.InputOption{
 		Name:        "system",
-		Description: "Include system values",
+		Description: "Include os values",
 		Mode:        cli.InputOptionBool,
 	})
 }

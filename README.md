@@ -5,7 +5,7 @@
 
 ## Usage:
 ```sh
-$ print [options] [--] [dir]
+$ envc [options] [--] [dir]
 ```
 
 ## Arguments:
@@ -51,6 +51,10 @@ dir                     -- The directory to check for .env files [default: ./]
 ```
 
 ```
+    --system            -- Include os values
+```
+
+```
 -h, --help              -- Display help for the print command
 ```
 
@@ -63,7 +67,7 @@ dir                     -- The directory to check for .env files [default: ./]
 ```
 
 ```
---ansi|--no-ansi        -- Force (or disable --no-ansi) ANSI output
+    --ansi|--no-ansi    -- Force (or disable --no-ansi) ANSI output
 ```
 
 ```
