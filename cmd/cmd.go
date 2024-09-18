@@ -9,100 +9,74 @@ import (
 	"github.com/michielnijenhuis/cli"
 )
 
-// TODO: add option to include system values for each env var found
-
-var Command *cli.Command
-
-func init() {
-	Command = &cli.Command{
-		Name:        "envc",
-		Description: "Prints all variables in the available .env file(s), sorted alphabetically",
-		Handle:      handle,
-	}
-
-	Command.AddArgument(&cli.InputArgument{
-		Name:         "dir",
-		Description:  "The directory to check for .env files",
-		Mode:         cli.InputArgumentOptional,
-		DefaultValue: "./",
-	})
-
-	Command.AddOption(&cli.InputOption{
-		Name:         "source",
-		Description:  "The base .env file to compare with",
-		Mode:         cli.InputOptionRequired,
-		DefaultValue: ".env.example",
-	})
-
-	Command.AddOption(&cli.InputOption{
-		Name:         "target",
-		Description:  "The .env file(s) to compare against",
-		Mode:         cli.InputOptionIsArray | cli.InputOptionRequired,
-		DefaultValue: []string{".env"},
-	})
-
-	Command.AddOption(&cli.InputOption{
-		Name:        "env",
-		Shortcut:    "e",
-		Description: "The environment .env to include in the comparison (e.g. `.env.dev`)",
-		Mode:        cli.InputOptionRequired,
-	})
-
-	Command.AddOption(&cli.InputOption{
-		Name:        "local",
-		Shortcut:    "l",
-		Description: "Whether to include local .env files (e.g. `.env.local` or `.env.dev.local`)",
-		Mode:        cli.InputOptionBool,
-	})
-
-	Command.AddOption(&cli.InputOption{
-		Name:        "result",
-		Shortcut:    "r",
-		Description: "Include conjuncted .env file result",
-		Mode:        cli.InputOptionBool,
-	})
-
-	Command.AddOption(&cli.InputOption{
-		Name:         "truncate",
-		Shortcut:     "t",
-		Description:  "Whether to truncate long values or not",
-		Mode:         cli.InputOptionRequired,
-		DefaultValue: "40",
-	})
-
-	Command.AddOption(&cli.InputOption{
-		Name:        "skip",
-		Shortcut:    "s",
-		Description: "Comma separated list of variable name patterns to skip",
-		Mode:        cli.InputOptionRequired,
-	})
-
-	Command.AddOption(&cli.InputOption{
-		Name:        "pattern",
-		Shortcut:    "p",
-		Description: "Comma separated list of variable name patterns to focus on",
-		Mode:        cli.InputOptionRequired,
-	})
-
-	Command.AddOption(&cli.InputOption{
-		Name:        "interpolate",
-		Shortcut:    "i",
-		Description: "Interpolate env var values that refer to other env vars",
-		Mode:        cli.InputOptionBool,
-	})
-
-	Command.AddOption(&cli.InputOption{
-		Name:        "system",
-		Description: "Include os values",
-		Mode:        cli.InputOptionBool,
-	})
-
-	Command.AddOption(&cli.InputOption{
-		Name:        "all",
-		Shortcut:    "a",
-		Description: "Include all .env files that can be found",
-		Mode:        cli.InputOptionBool,
-	})
+var Command = &cli.Command{
+	Name:        "envc",
+	Description: "Prints all variables in the available .env file(s), sorted alphabetically",
+	Arguments: []cli.Arg{
+		&cli.StringArg{
+			Name:        "dir",
+			Description: "The directory to check for .env files",
+			Value:       "./",
+		},
+	},
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:        "source",
+			Description: "The base .env file to compare with",
+			Value:       ".env.example",
+		},
+		&cli.ArrayFlag{
+			Name:        "target",
+			Description: "The .env file(s) to compare against",
+			Value:       []string{".env"},
+		},
+		&cli.StringFlag{
+			Name:        "env",
+			Shortcuts:   []string{"e"},
+			Description: "The environment .env to include in the comparison (e.g. `.env.dev`)",
+		},
+		&cli.BoolFlag{
+			Name:        "local",
+			Shortcuts:   []string{"l"},
+			Description: "Whether to include local .env files (e.g. `.env.local` or `.env.dev.local`)",
+		},
+		&cli.StringFlag{
+			Name:        "skip",
+			Shortcuts:   []string{"s"},
+			Description: "Comma separated list of variable name patterns to skip",
+		},
+		&cli.StringFlag{
+			Name:        "pattern",
+			Shortcuts:   []string{"p"},
+			Description: "Comma separated list of variable name patterns to focus on",
+		},
+		&cli.BoolFlag{
+			Name:        "interpolate",
+			Shortcuts:   []string{"i"},
+			Description: "Interpolate env var values that refer to other env vars",
+		},
+		&cli.BoolFlag{
+			Name:        "result",
+			Shortcuts:   []string{"r"},
+			Description: "Include conjuncted .env file result",
+		},
+		&cli.StringFlag{
+			Name:        "truncate",
+			Shortcuts:   []string{"t"},
+			Description: "Whether to truncate long values or not",
+			Value:       "40",
+		},
+		&cli.BoolFlag{
+			Name:        "system",
+			Description: "Include os values",
+		},
+		&cli.BoolFlag{
+			Name:        "all",
+			Shortcuts:   []string{"a"},
+			Description: "Include all .env files that can be found",
+		},
+	},
+	RunE: handle,
 }
 
 type Options struct {
@@ -120,25 +94,25 @@ type Options struct {
 	All         bool
 }
 
-func handle(c *cli.Command) (int, error) {
+func handle(c *cli.Ctx) error {
 	options, err := getOptions(c)
 	if err != nil {
-		return 1, err
+		return err
 	}
 
 	paths, err := getEnvFilePaths(options)
 	if err != nil {
-		return 1, err
+		return err
 	}
 
 	err = validateFilePaths(paths)
 	if err != nil {
-		return 1, err
+		return err
 	}
 
 	envs, err := readEnvFiles(paths)
 	if err != nil {
-		return 1, err
+		return err
 	}
 
 	keysIndex := makeEnvVarIndex(envs)
@@ -159,110 +133,44 @@ func handle(c *cli.Command) (int, error) {
 	if options.Interpolate {
 		err := interpolate(envs, keys, nil, 3)
 		if err != nil {
-			return 1, err
+			return err
 		}
 	}
 
-	renderEnvsInTable(c.Output(), envs, keys, paths, options)
+	renderEnvsInTable(c, envs, keys, paths, options)
 
-	return 0, nil
+	if options.Result {
+		renderLegend(c)
+	}
+
+	return nil
 }
 
-func getOptions(c *cli.Command) (*Options, error) {
-	options := &Options{}
-
-	// dir
-	dir, err := c.StringArgument("dir")
-	if err != nil {
-		return nil, err
+func getOptions(c *cli.Ctx) (*Options, error) {
+	options := &Options{
+		Dir:         strings.TrimSuffix(c.String("dir"), "/"),
+		Source:      c.String("source"),
+		Target:      c.Array("target"),
+		Env:         c.String("env"),
+		Local:       c.Bool("local"),
+		Skip:        c.String("skip"),
+		Pattern:     c.String("pattern"),
+		Interpolate: c.Bool("interpolate"),
+		Result:      c.Bool("result"),
+		System:      c.Bool("system"),
+		All:         c.Bool("all"),
 	}
-	options.Dir = strings.TrimSuffix(dir, "/")
-
-	// source
-	source, err := c.StringOption("source")
-	if err != nil {
-		return nil, err
-	}
-	options.Source = source
-
-	// targets
-	targets, err := c.ArrayOption("target")
-	if err != nil {
-		return nil, err
-	}
-	// validate?
-	options.Target = targets
-
-	// env
-	env, err := c.StringOption("env")
-	if err != nil {
-		return nil, err
-	}
-	options.Env = env
-
-	// local
-	local, err := c.BoolOption("local")
-	if err != nil {
-		return nil, err
-	}
-	options.Local = local
-
-	// skip
-	skip, err := c.StringOption("skip")
-	if err != nil {
-		return nil, err
-	}
-	options.Skip = skip
-
-	// pattern
-	pattern, err := c.StringOption("pattern")
-	if err != nil {
-		return nil, err
-	}
-	options.Pattern = pattern
 
 	if options.Skip != "" && options.Pattern != "" {
 		return nil, errors.New("can't have a value for both the 'skip' and 'pattern' options")
 	}
 
-	// interpolate
-	interpolate, err := c.BoolOption("interpolate")
-	if err != nil {
-		return nil, err
-	}
-	options.Interpolate = interpolate
-
-	// truncate
-	truncate, err := c.StringOption("truncate")
-	if err != nil {
-		return nil, err
-	}
+	truncate := c.String("truncate")
 	integer, err := strconv.Atoi(truncate)
 	if err != nil {
-		return nil, err
+		return options, err
 	}
 	options.Truncate = integer
-
-	// result
-	includeResult, err := c.BoolOption("result")
-	if err != nil {
-		return nil, err
-	}
-	options.Result = includeResult
-
-	// system
-	system, err := c.BoolOption("system")
-	if err != nil {
-		return nil, err
-	}
-	options.System = system
-
-	// all
-	all, err := c.BoolOption("all")
-	if err != nil {
-		return nil, err
-	}
-	options.All = all
 
 	return options, nil
 }

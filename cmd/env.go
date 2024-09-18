@@ -47,7 +47,6 @@ func readEnvFile(path string) (map[string]*EnvVar, error) {
 		parts := strings.SplitN(line, "=", 2)
 
 		if len(parts) == 0 {
-			// TODO: how to handle?
 			continue
 		}
 

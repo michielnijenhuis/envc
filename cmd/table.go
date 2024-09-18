@@ -6,21 +6,22 @@ import (
 	"github.com/michielnijenhuis/cli"
 )
 
-func renderEnvsInTable(output *cli.Output, envs []map[string]*EnvVar, keys []string, paths []string, options *Options) {
+func renderEnvsInTable(c *cli.Ctx, envs []map[string]*EnvVar, keys []string, paths []string, options *Options) {
 	headers := makeTableHeaders(envs, paths, options)
 	rows := makeTableRows(envs, keys, options)
 
-	table := cli.NewTable(output)
+	table := cli.NewTable(c.Output)
 	table.SetRows(rows)
 	table.SetHeaders(headers)
 	table.SetStyleByName("box")
 
-	// style := cli.NewTableStyle("box")
-	// style.CellRowContentFormat = "<options=bold> %s </>"
-	// table.SetColumnStyle(0, style)
-
-	output.NewLine(1)
+	c.NewLine(1)
 	table.Render()
+}
+
+func renderLegend(c *cli.Ctx) {
+	c.NewLine(1)
+	c.Writeln(cli.Dim("Legend:\n") + "<fg=red>x</> Missing   <fg=magenta>?</> Undefined   <fg=yellow>!</> Divergent")
 }
 
 func makeTableHeaders(envs []map[string]*EnvVar, paths []string, options *Options) []string {

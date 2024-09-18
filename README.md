@@ -6,9 +6,13 @@
 ## Installation:
 **Homebrew**:
 ```sh
-$ brew install envc
+$ brew install michielnijenhuis/cli/envc
 ```
 
+**Go**:
+```sh
+$ go install github.com/michielnijenhuis/envc
+```
 
 **Manually**:
 Clone the repository, and run:
@@ -16,6 +20,7 @@ Clone the repository, and run:
 ```sh
 $ make install
 ```
+
 If you don't have `make` installed, run:
 ```sh
 $ go build -o ./bin/envc

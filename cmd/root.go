@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"log"
-
 	"github.com/michielnijenhuis/cli"
 )
 
@@ -11,14 +9,12 @@ func Execute() {
 		Name:           "envc",
 		Version:        "v2.2.1",
 		CatchErrors:    true,
-		AutoExit:       true,
 		SingleCommand:  true,
 		DefaultCommand: "envc",
+		Commands: []*cli.Command{
+			Command,
+		},
 	}
 
-	app.Add(Command)
-
-	if _, err := app.Run(); err != nil {
-		log.Fatalln(err)
-	}
+	app.RunExit()
 }
